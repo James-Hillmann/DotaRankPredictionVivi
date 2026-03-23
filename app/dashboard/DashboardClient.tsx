@@ -94,7 +94,7 @@ export default function DashboardClient({ personaName, avatarUrl }: Props) {
             <div>
               <h1 className="text-3xl font-bold text-white">Your Rank Prediction</h1>
               <p className="text-gray-400 mt-1 text-sm">
-                Based on your last {data.prediction.breakdown.length > 0 ? "20" : "0"} matches from OpenDota.
+                Based on your last {data.prediction.matchesAnalyzed} matches from OpenDota.
               </p>
             </div>
 

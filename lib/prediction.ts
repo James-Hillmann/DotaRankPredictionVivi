@@ -17,6 +17,7 @@ export interface PredictionResult {
   breakdown: StatBreakdown[];
   winRate: number;
   totalGames: number;
+  matchesAnalyzed: number;
 }
 
 // Clamp a value between 0 and 100
@@ -121,6 +122,7 @@ export function predictRank(
       breakdown: [],
       winRate: 0,
       totalGames: 0,
+      matchesAnalyzed: 0,
     };
   }
 
@@ -266,5 +268,6 @@ export function predictRank(
     breakdown,
     winRate,
     totalGames,
+    matchesAnalyzed: n,
   };
 }

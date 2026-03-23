@@ -59,7 +59,7 @@ async function opendotaFetch<T>(path: string): Promise<T> {
 export async function fetchPlayerStats(accountId: number): Promise<PlayerStats> {
   const [player, wl, recentMatches, totals] = await Promise.all([
     opendotaFetch<PlayerData>(`/players/${accountId}`),
-    opendotaFetch<WinLoss>(`/players/${accountId}/wl?limit=100`),
+    opendotaFetch<WinLoss>(`/players/${accountId}/wl`),
     opendotaFetch<RecentMatch[]>(`/players/${accountId}/recentMatches`),
     opendotaFetch<PlayerTotals[]>(`/players/${accountId}/totals`),
   ]);
