@@ -62,21 +62,18 @@ async function opendotaFetch<T>(path: string): Promise<T> {
 }
 
 // Standard game modes: All Pick, CM, Random Draft, Single Draft, All Random, CD, Ranked AP
-const STANDARD_GAME_MODES = [1, 2, 3, 4, 5, 16, 22];
-const GAME_MODE_FILTER = STANDARD_GAME_MODES.map((m) => `game_mode=${m}`).join("&");
+export const STANDARD_GAME_MODES = [1, 2, 3, 4, 5, 16, 22];
 
 export async function fetchPlayerStats(accountId: number): Promise<PlayerStats> {
   const [player, wl, recentMatches, totals] = await Promise.all([
     opendotaFetch<PlayerData>(`/players/${accountId}`),
-    opendotaFetch<WinLoss>(`/players/${accountId}/wl?${GAME_MODE_FILTER}`),
+    opendotaFetch<WinLoss>(`/players/${accountId}/wl`), // all-time, used for total game count
     opendotaFetch<RecentMatch[]>(`/players/${accountId}/recentMatches`),
     opendotaFetch<PlayerTotals[]>(`/players/${accountId}/totals`),
   ]);
 
   return { player, wl, recentMatches, totals };
 }
-
-export { STANDARD_GAME_MODES };
 
 export function rankTierToLabel(tier: number | null): string {
   if (!tier) return "Unranked";

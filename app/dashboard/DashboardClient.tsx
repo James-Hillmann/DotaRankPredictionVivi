@@ -119,9 +119,9 @@ export default function DashboardClient({ personaName, avatarUrl }: Props) {
                 {[
                   {
                     label: "Win Rate",
-                    value: `${data.prediction.winRate.toFixed(1)}%`,
-                    sub: `${data.wl.win}W / ${data.wl.lose}L`,
-                    color: data.prediction.winRate >= 50 ? "text-green-400" : "text-red-400",
+                    value: `${((data.wl.win / (data.wl.win + data.wl.lose)) * 100).toFixed(1)}%`,
+                    sub: `${data.wl.win}W / ${data.wl.lose}L all time`,
+                    color: data.wl.win / (data.wl.win + data.wl.lose) >= 0.5 ? "text-green-400" : "text-red-400",
                   },
                   {
                     label: "Total Games",

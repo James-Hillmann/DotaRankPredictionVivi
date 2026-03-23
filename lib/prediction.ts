@@ -165,8 +165,16 @@ export function predictRank(
   const avgTowerDmgPerMin = totalTowerDmg / n;
   const avgHealingPerMin = totalHealing / n;
   const avgWardsPerGame = (totalObserver + totalSentry) / n;
+
+  // Compute win rate from filtered matches directly (avoids wl endpoint game-mode issues)
+  const filteredWins = filtered.filter((m) => {
+    const isRadiant = m.player_slot < 128;
+    return isRadiant ? m.radiant_win : !m.radiant_win;
+  }).length;
+  const winRate = n > 0 ? (filteredWins / n) * 100 : 50;
+
+  // All-time game count from the wl endpoint (unfiltered)
   const totalGames = wl.win + wl.lose;
-  const winRate = totalGames > 0 ? (wl.win / totalGames) * 100 : 50;
 
   // Normalize each stat to 0–100
   const scores = {
@@ -252,14 +260,16 @@ export function predictRank(
       value: avgWardsPerGame.toFixed(1),
       score: scores.wardsPerGame,
       weight: WEIGHTS.wardsPerGame,
-      description: "Observer + sentry usage per game",
+      description: avgWardsPerGame === 0
+        ? "No ward data — OpenDota only tracks wards on fully parsed matches"
+        : "Observer + sentry wards placed per game",
     },
     {
       label: "Win Rate",
       value: `${winRate.toFixed(1)}%`,
       score: scores.winRate,
       weight: WEIGHTS.winRate,
-      description: `${wl.win}W / ${wl.lose}L over ${totalGames} games`,
+      description: `${filteredWins}W / ${n - filteredWins}L across ${n} standard-mode matches`,
     },
   ];
 
