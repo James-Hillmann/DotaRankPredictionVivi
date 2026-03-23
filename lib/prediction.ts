@@ -1,4 +1,4 @@
-import { RecentMatch, WinLoss } from "./opendota";
+import { RecentMatch, WinLoss, STANDARD_GAME_MODES } from "./opendota";
 
 export interface StatBreakdown {
   label: string;
@@ -112,7 +112,10 @@ export function predictRank(
   matches: RecentMatch[],
   wl: WinLoss
 ): PredictionResult {
-  if (matches.length === 0) {
+  // Filter to standard game modes only (no turbo, ability draft, etc.)
+  const filtered = matches.filter((m) => STANDARD_GAME_MODES.includes(m.game_mode));
+
+  if (filtered.length === 0) {
     return {
       estimatedMmr: 0,
       rankLabel: "Not enough data",
@@ -133,7 +136,7 @@ export function predictRank(
   let totalObserver = 0, totalSentry = 0;
   let totalDuration = 0;
 
-  for (const m of matches) {
+  for (const m of filtered) {
     const durationMin = m.duration / 60;
     totalKills += m.kills;
     totalDeaths += m.deaths;
@@ -144,12 +147,13 @@ export function predictRank(
     totalHeroDmg += m.hero_damage / durationMin;
     totalTowerDmg += (m.tower_damage ?? 0) / durationMin;
     totalHealing += (m.hero_healing ?? 0) / durationMin;
-    totalObserver += (m.observer_uses ?? 0);
-    totalSentry += (m.sentry_uses ?? 0);
+    // OpenDota uses obs_placed/sen_placed in some endpoints, observer_uses/sentry_uses in others
+    totalObserver += (m.obs_placed ?? m.observer_uses ?? 0);
+    totalSentry += (m.sen_placed ?? m.sentry_uses ?? 0);
     totalDuration += durationMin;
   }
 
-  const n = matches.length;
+  const n = filtered.length;
   const avgDeaths = totalDeaths / n;
   const kda = avgDeaths === 0
     ? (totalKills + totalAssists) / n
